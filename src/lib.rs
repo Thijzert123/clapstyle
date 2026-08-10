@@ -1,18 +1,18 @@
 use clap::builder::Styles;
 use duplicate::duplicate_item;
+use parking_lot::RwLock;
 use pastey::paste;
-use std::sync::OnceLock;
 
 #[doc(hidden)]
 pub use anstream;
 
-pub fn get_clap_styles() -> &'static Styles {
-    static CLAP_STYLE: OnceLock<Styles> = OnceLock::new();
-    CLAP_STYLE.get_or_init(|| Styles::styled())
-}
+pub static CLAP_STYLES: RwLock<Styles> = RwLock::new(Styles::styled());
 
 // TODO also implement anyhow result styling
 // TODO handle panic
+// TODO document everything
+// TODO convenience methods for for example errors
+// TODO get style (re-export?)
 
 #[duplicate_item(
     print_type;
@@ -48,7 +48,8 @@ paste! {
            $crate::anstream::println!()
        };
        ($($arg:tt)*) => {{
-           let style = $crate::get_clap_styles().[<get_ style_type>]();
+           let clap_styles = $crate::CLAP_STYLES.read();
+           let style = clap_styles.[<get_ style_type>]();
            $crate::anstream::print_type!("{}{}{:#}", style, ::std::format_args!($($arg)*), style);
        }};
    }
