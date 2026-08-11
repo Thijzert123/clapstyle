@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 anstream = "1.0.0"
+anstyle = "1.0.14"
 clap = "4.6.6"
 duplicate = "2.0.1"
 parking_lot = "0.12.5"

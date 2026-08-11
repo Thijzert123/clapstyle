@@ -78,6 +78,7 @@ name = "clap-styled-output"
 version = "0.1.0"
 dependencies = [
  "anstream",
+ "anstyle",
  "clap",
  "duplicate",
  "parking_lot",
