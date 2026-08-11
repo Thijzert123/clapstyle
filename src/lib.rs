@@ -67,26 +67,26 @@ pub fn wrap_style(style: &Style, args: fmt::Arguments<'_>) -> String {
     [usage];
 )]
 paste! {
-   #[doc = "`" print_type "` with Clap's `" style_type "` style"]
-   #[doc = ""]
-   #[doc = "Drop-in replacement for `" print_type "!` macro."]
-   #[doc = "The style Clap uses for `" style_type "` gets applied to everything that gets passed."]
-   #[doc = "Afterward, the style resets so all other text do not have this style."]
-   #[doc = ""]
-   #[doc = "The text gets passed through [`anstream`]."]
-   #[doc = "This means that the applied style gets removed if, for example, the output is piped."]
-   #[macro_export]
-   macro_rules! [<print_type _ style_type>] {
-       () => {
-           $crate::anstream::print_type!()
-       };
-       ($($arg:tt)*) => {{
-           let clap_styles = $crate::CLAP_STYLES.read();
-           let style = clap_styles.[<get_ style_type>]();
-           let out = $crate::wrap_style(style, ::std::format_args!($($arg)*));
-           $crate::anstream::print_type!("{}", out);
-       }};
-   }
+    #[doc = "`" print_type "` with Clap's `" style_type "` style"]
+    #[doc = ""]
+    #[doc = "Drop-in replacement for `" print_type "!` macro."]
+    #[doc = "The style Clap uses for `" style_type "` gets applied to everything that gets passed."]
+    #[doc = "Afterward, the style resets so all other text do not have this style."]
+    #[doc = ""]
+    #[doc = "The text gets passed through [`anstream`]."]
+    #[doc = "This means that the applied style gets removed if, for example, the output is piped."]
+    #[macro_export]
+    macro_rules! [<print_type _ style_type>] {
+        () => {
+            $crate::anstream::print_type!()
+        };
+        ($($arg:tt)*) => {{
+            let clap_styles = $crate::CLAP_STYLES.read();
+            let style = clap_styles.[<get_ style_type>]();
+            let out = $crate::wrap_style(style, ::std::format_args!($($arg)*));
+            $crate::anstream::print_type!("{}", out);
+        }};
+    }
 }
 
 #[duplicate_item(
@@ -97,17 +97,17 @@ paste! {
     [eprintln];
 )]
 paste! {
-   #[doc = "`" print_type "` without a style"]
-   #[doc = ""]
-   #[doc = "Drop-in replacement for `" print_type "!` macro."]
-   #[doc = "The text gets passed through [`anstream`]."]
-   #[doc = "This means that possible manually applied styles get removed if, for example, the output is piped."]
-   #[macro_export]
-   macro_rules! print_type {
-       ($($arg:tt)*) => {
-           $crate::anstream::print_type!($($arg)*);
-       };
-   }
+    #[doc = "`" print_type "` without a style"]
+    #[doc = ""]
+    #[doc = "Drop-in replacement for `" print_type "!` macro."]
+    #[doc = "The text gets passed through [`anstream`]."]
+    #[doc = "This means that possible manually applied styles get removed if, for example, the output is piped."]
+    #[macro_export]
+    macro_rules! print_type {
+        ($($arg:tt)*) => {
+            $crate::anstream::print_type!($($arg)*);
+        };
+    }
 }
 
 pub trait ClapStylize {
