@@ -1,5 +1,5 @@
 [package]
-name = "clap-styled-output"
+name = "clapstyle"
 version = "0.1.0"
 edition = "2024"
 

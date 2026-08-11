@@ -43,7 +43,6 @@ pub fn wrap_style(style: &Style, args: fmt::Arguments<'_>) -> String {
 }
 
 // TODO document everything
-// TODO change crate name
 
 #[duplicate_item(
     print_type;

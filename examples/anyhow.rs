@@ -3,7 +3,7 @@ use std::fs;
 
 // Use this crates' println macro, so that styles get piped through anstreams println.
 // This makes sure the style codes get removed when the user can't see it (e.g. piping into a file)
-use clap_styled_output::println;
+use clapstyle::println;
 
 fn main() {
     // Normal display, single line with last error
@@ -30,7 +30,7 @@ fn main() {
     }
 }
 
-fn try_main() -> clap_styled_output::Result<()> {
+fn try_main() -> clapstyle::Result<()> {
     process_file()?;
     Ok(())
 }

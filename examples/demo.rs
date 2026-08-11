@@ -1,4 +1,4 @@
-use clap_styled_output::*;
+use clapstyle::*;
 
 fn main() {
     println_context!("context");
