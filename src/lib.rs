@@ -43,7 +43,6 @@ pub fn wrap_style(style: &Style, args: fmt::Arguments<'_>) -> String {
 }
 
 // TODO also implement anyhow result styling
-// TODO handle panic
 // TODO document everything
 // TODO convenience methods for for example errors
 
@@ -53,6 +52,7 @@ pub fn wrap_style(style: &Style, args: fmt::Arguments<'_>) -> String {
     [println];
     [eprint];
     [eprintln];
+    [panic];
 )]
 #[duplicate_item(
     style_type;
@@ -95,6 +95,7 @@ paste! {
     [println];
     [eprint];
     [eprintln];
+    [panic];
 )]
 paste! {
     #[doc = "`" print_type "` without a style"]
