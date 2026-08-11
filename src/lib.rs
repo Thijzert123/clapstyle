@@ -44,7 +44,7 @@ pub fn wrap_style(style: &Style, args: fmt::Arguments<'_>) -> String {
 
 // TODO also implement anyhow result styling
 // TODO document everything
-// TODO convenience methods for for example errors
+// TODO change crate name
 
 #[duplicate_item(
     print_type;
