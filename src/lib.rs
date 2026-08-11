@@ -42,7 +42,6 @@ pub fn wrap_style(style: &Style, args: fmt::Arguments<'_>) -> String {
     out
 }
 
-// TODO also implement anyhow result styling
 // TODO document everything
 // TODO change crate name
 
@@ -177,6 +176,7 @@ pub struct Error(anyhow::Error);
 
 #[cfg(feature = "anyhow")]
 mod error_impl {
+    use std::backtrace::BacktraceStatus;
     use std::fmt::Debug;
     use std::fmt::Display;
 
@@ -191,31 +191,71 @@ mod error_impl {
         }
     }
 
-    impl From<anyhow::Error> for Error {
-        fn from(anyhow_error: anyhow::Error) -> Self {
-            Error(anyhow_error)
+    impl<E: Into<anyhow::Error>> From<E> for Error {
+        fn from(anyhow_error: E) -> Self {
+            Error(anyhow_error.into())
         }
     }
 
     impl Display for Error {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            let error = first_char_lowercase(&if f.alternate() {
-                format!("{:#}", self.0)
-            } else {
-                format!("{}", self.0)
-            });
-            write!(f, "{} {}", "error:".style_error(), error)
+            let mut chain = self.0.chain();
+            let error = first_char_lowercase(&format!("{}", chain.next().unwrap()));
+            write!(f, "{} {}", "error:".style_error(), error)?;
+
+            if f.alternate()
+                && let Some(cause) = chain.next()
+            {
+                write!(f, ": {}", first_char_lowercase(&format!("{}", cause)))?;
+            }
+
+            Ok(())
         }
     }
 
     impl Debug for Error {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            let error = first_char_lowercase(&if f.alternate() {
-                format!("{:#?}", self.0)
-            } else {
-                format!("{:?}", self.0)
-            });
-            write!(f, "{} {}", "error:".style_error(), error)
+            if f.alternate() {
+                return write!(f, "{:#?}", self.0);
+            }
+
+            let mut chain = self.0.chain();
+            let error = first_char_lowercase(&format!("{}", chain.next().unwrap()));
+            writeln!(f, "{} {}", "error:".style_error(), error)?;
+            writeln!(f)?;
+            write!(f, "{}", "Caused by:".style_header())?;
+
+            if chain.len() == 1 {
+                // No extra causes
+                writeln!(f)?;
+                write!(f, "    {}", chain.next().unwrap())?;
+            } else if chain.len() > 1 {
+                // Chain has numbered causes
+                for (i, cause) in chain.enumerate() {
+                    let cause = first_char_lowercase(&format!("{}", cause));
+                    writeln!(f)?;
+                    write!(f, "    {}: {}", i, cause)?;
+                }
+            }
+
+            let backtrace = self.0.backtrace();
+            if backtrace.status() == BacktraceStatus::Captured {
+                writeln!(f)?;
+                writeln!(f)?;
+                writeln!(f, "{}", "Stack backtrace:".style_header())?;
+
+                let mut backtrace = backtrace.to_string();
+                backtrace.truncate(backtrace.trim_end().len());
+                // Add 1 space to indentation to make it consistent with 'Caused by:' tree.
+                let backtrace = backtrace
+                    .lines()
+                    .map(|line| format!(" {line}"))
+                    .collect::<Vec<_>>()
+                    .join("\n");
+                write!(f, "{}", backtrace)?;
+            }
+
+            Ok(())
         }
     }
 }
