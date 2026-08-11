@@ -45,12 +45,33 @@ paste! {
    #[macro_export]
    macro_rules! [<print_type _ style_type>] {
        () => {
-           $crate::anstream::println!()
+           $crate::anstream::print_type!()
        };
        ($($arg:tt)*) => {{
            let clap_styles = $crate::CLAP_STYLES.read();
            let style = clap_styles.[<get_ style_type>]();
            $crate::anstream::print_type!("{}{}{:#}", style, ::std::format_args!($($arg)*), style);
        }};
+   }
+}
+
+#[duplicate_item(
+    print_type;
+    [print];
+    [println];
+    [eprint];
+    [eprintln];
+)]
+paste! {
+   #[doc = "`" print_type "` without a style"]
+   #[doc = ""]
+   #[doc = "Drop-in replacement for `" print_type "!` macro."]
+   #[doc = "The text gets passed through [`anstream`]."]
+   #[doc = "This means that possible manually applied styles get removed if, for example, the output is piped."]
+   #[macro_export]
+   macro_rules! print_type {
+       ($($arg:tt)*) => {
+           $crate::anstream::print_type!($($arg)*);
+       };
    }
 }
