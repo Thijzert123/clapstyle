@@ -3,9 +3,13 @@ name = "clap-styled-output"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+anyhow = ["dep:anyhow"]
+
 [dependencies]
 anstream = "1.0.0"
 anstyle = "1.0.14"
+anyhow = { version = "1.0.104", optional = true }
 clap = "4.6.6"
 duplicate = "2.0.1"
 parking_lot = "0.12.5"

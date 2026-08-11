@@ -168,3 +168,54 @@ impl<'a, T: fmt::trait_name> fmt::trait_name for ClapStyledValue<'a, T> {
         write!(f, "{}", pop_style_and_restore())
     }
 }
+
+#[cfg(feature = "anyhow")]
+pub type Result<T, E = Error> = core::result::Result<T, E>;
+
+#[cfg(feature = "anyhow")]
+pub struct Error(anyhow::Error);
+
+#[cfg(feature = "anyhow")]
+mod error_impl {
+    use std::fmt::Debug;
+    use std::fmt::Display;
+
+    use crate::ClapStylize;
+    use crate::Error;
+
+    fn first_char_lowercase(s: &str) -> String {
+        let mut chars = s.chars();
+        match chars.next() {
+            Some(first_char) => first_char.to_lowercase().chain(chars).collect(),
+            None => String::new(),
+        }
+    }
+
+    impl From<anyhow::Error> for Error {
+        fn from(anyhow_error: anyhow::Error) -> Self {
+            Error(anyhow_error)
+        }
+    }
+
+    impl Display for Error {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            let error = first_char_lowercase(&if f.alternate() {
+                format!("{:#}", self.0)
+            } else {
+                format!("{}", self.0)
+            });
+            write!(f, "{} {}", "error:".style_error(), error)
+        }
+    }
+
+    impl Debug for Error {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            let error = first_char_lowercase(&if f.alternate() {
+                format!("{:#?}", self.0)
+            } else {
+                format!("{:?}", self.0)
+            });
+            write!(f, "{} {}", "error:".style_error(), error)
+        }
+    }
+}
