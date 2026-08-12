@@ -1,3 +1,5 @@
+#![cfg_attr(docsrs, feature(doc_cfg))]
+
 //! Simple utility library to match your CLI's output to Clap's output.
 //! This means that your, headers, errors, literals, etc. all have the same style as Clap.
 //!
