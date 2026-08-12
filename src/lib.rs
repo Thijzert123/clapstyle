@@ -111,9 +111,9 @@ thread_local! {
     static STYLE_STACK: RefCell<Vec<Style>> = RefCell::new(Vec::new());
 }
 
-fn push_style(style: Style) -> Style {
+fn push_style_and_apply(style: Style) -> String {
     STYLE_STACK.with(|s| s.borrow_mut().push(style));
-    style
+    format!("{}{}", anstyle::Reset, style)
 }
 
 fn pop_style_and_restore() -> String {
@@ -131,7 +131,7 @@ fn pop_style_and_restore() -> String {
 #[doc(hidden)]
 pub fn wrap_style(style: &Style, args: fmt::Arguments<'_>) -> String {
     let mut out = String::new();
-    write!(out, "{}", push_style(style.clone())).unwrap();
+    write!(out, "{}", push_style_and_apply(style.clone())).unwrap();
     out.write_fmt(args).unwrap();
     write!(out, "{}", pop_style_and_restore()).unwrap();
     out
@@ -242,7 +242,7 @@ pub struct ClapStyledValue<'a, T> {
 impl<'a, T: fmt::trait_name> fmt::trait_name for ClapStyledValue<'a, T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Make sure things like aligning keep working
-        write!(f, "{}", push_style(self.style))?;
+        write!(f, "{}", push_style_and_apply(self.style))?;
         fmt::trait_name::fmt(self.value, f)?;
         write!(f, "{}", pop_style_and_restore())
     }
