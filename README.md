@@ -9,3 +9,9 @@ Features:
 - Change Clap's style via a static variable
 
 For more information, please take a look at the docs.
+
+## Installation
+Clapstyle is available on [crates.io](https://crates.io/crates/clapstyle).
+```bash
+cargo add clapstyle
+```
