@@ -63,6 +63,15 @@
 //! ## Change Clap's style
 //! If you want to change the style of all Clap-styled output, you can modify the [`CLAP_STYLES`]
 //! variable. This doesn't change Clap's output, however.
+//!
+//! ## Examples
+//! Please take a look at the examples available in the `examples` directory in the repository.
+//! You can run them with Cargo:
+//! ```bash
+//! cargo run --example demo
+//! # or
+//! cargo run --example anyhow --features=anyhow
+//! ```
 
 use clap::builder::{Styles, styling::Style};
 use duplicate::duplicate_item;
