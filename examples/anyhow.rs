@@ -1,5 +1,4 @@
 use anyhow::Context;
-use std::fs;
 
 // Use this crates' println macro, so that styles get piped through anstreams println.
 // This makes sure the style codes get removed when the user can't see it (e.g. piping into a file)
@@ -40,6 +39,6 @@ fn process_file() -> anyhow::Result<()> {
 }
 
 fn read_file() -> anyhow::Result<()> {
-    fs::read_to_string("doesnt_exist").with_context(|| "Couldn't open file")?;
+    std::fs::read_to_string("doesnt_exist").with_context(|| "Couldn't open file")?;
     Ok(())
 }

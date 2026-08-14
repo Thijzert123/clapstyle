@@ -80,6 +80,8 @@ use duplicate::duplicate_item;
 use parking_lot::RwLock;
 use pastey::paste;
 use std::fmt::Write;
+use std::process::ExitCode;
+use std::process::Termination;
 use std::{cell::RefCell, fmt};
 
 // For doc comments
@@ -266,11 +268,39 @@ impl<'a, T: fmt::trait_name> fmt::trait_name for ClapStyledValue<'a, T> {
 ///     Ok(())
 /// }
 /// ```
-///
-/// Just like [`anyhow::Result`], setting it as the return value of `main()` makes sure any errors get
-/// pretty prined using the [`Debug`] trait.
 #[cfg(feature = "anyhow")]
 pub type Result<T, E = Error> = core::result::Result<T, E>;
+
+#[cfg(feature = "anyhow")]
+use sealed::sealed;
+
+/// Extension trait to use instead of [`Termination`] for [`Result`].
+///
+/// By default, [`Termination`] prints `Error:` before formatting using the [`Debug`] trait.
+/// This trait can be used to idiomatically circumvent that. See this example for how to use it:
+/// ```
+/// # #[cfg(feature = "anyhow")]
+/// # {
+/// use clapstyle::ResultExt;
+///
+/// fn main() -> std::process::ExitCode {
+///     read_file().report_clapstyle()
+/// }
+///
+/// fn read_file() -> clapstyle::Result<()> {
+///     std::fs::read_to_string("doesnt_exist")?;
+///     Ok(())
+/// }
+/// # }
+/// ```
+#[cfg(feature = "anyhow")]
+#[sealed]
+pub trait ResultExt {
+    /// Reports and returns an [`ExitCode`].
+    ///
+    /// Any errors are printed using this crate's macros.
+    fn report_clapstyle(self) -> ExitCode;
+}
 
 /// A wrapper around [`anyhow::Error`].
 ///
@@ -334,7 +364,7 @@ pub type Result<T, E = Error> = core::result::Result<T, E>;
 pub struct Error(anyhow::Error);
 
 #[cfg(feature = "anyhow")]
-mod error_impl {
+mod anyhow_impl {
     use std::backtrace::BacktraceStatus;
     use std::fmt::Debug;
     use std::fmt::Display;
@@ -380,10 +410,14 @@ mod error_impl {
 
             let mut chain = self.0.chain();
             let error = first_char_lowercase(&format!("{}", chain.next().unwrap()));
-            writeln!(f, "{} {}", "error:".style_error(), error)?;
-            writeln!(f)?;
-            write!(f, "{}", "Caused by:".style_header())?;
+            write!(f, "{} {}", "error:".style_error(), error)?;
 
+            if chain.len() > 0 {
+                // Skip header if no causes available
+                writeln!(f)?;
+                writeln!(f)?;
+                write!(f, "{}", "Caused by:".style_header())?;
+            }
             if chain.len() == 1 {
                 // No extra causes
                 writeln!(f)?;
@@ -415,6 +449,20 @@ mod error_impl {
             }
 
             Ok(())
+        }
+    }
+}
+
+#[cfg(feature = "anyhow")]
+#[sealed]
+impl<T: Termination> ResultExt for crate::Result<T> {
+    fn report_clapstyle(self) -> ExitCode {
+        match self {
+            Ok(value) => value.report(),
+            Err(error) => {
+                crate::eprintln!("{error:?}");
+                ExitCode::FAILURE
+            }
         }
     }
 }

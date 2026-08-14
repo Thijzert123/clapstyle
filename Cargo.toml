@@ -7,7 +7,7 @@ keywords = ["cli", "clap", "style", "color"]
 categories = ["command-line-interface", "value-formatting"]
 authors = ["Thijzert <184778919+Thijzert123@users.noreply.github.com>"]
 license = "MIT OR Apache-2.0"
-version = "0.1.2"
+version = "0.2.0"
 rust-version = "1.88.0"
 edition = "2024"
 
@@ -25,7 +25,12 @@ clap = "4.6.6"
 duplicate = "2.0.1"
 parking_lot = "0.12.5"
 pastey = "0.2.3"
+sealed = "0.7.0"
 
 [[example]]
 name = "anyhow"
+required-features = ["anyhow"]
+
+[[example]]
+name = "anyhow_main"
 required-features = ["anyhow"]
