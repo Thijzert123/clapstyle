@@ -455,12 +455,13 @@ mod anyhow_impl {
 
 #[cfg(feature = "anyhow")]
 #[sealed]
-impl<T: Termination> ResultExt for crate::Result<T> {
+impl<T: Termination, E: Into<Error>> ResultExt for std::result::Result<T, E> {
     fn report_clapstyle(self) -> ExitCode {
         match self {
             Ok(value) => value.report(),
             Err(error) => {
-                crate::eprintln!("{error:?}");
+                let clapstyle_error = error.into();
+                crate::eprintln!("{clapstyle_error:?}");
                 ExitCode::FAILURE
             }
         }
